@@ -1,0 +1,41 @@
+#!/bin/bash
+
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+BIGBLUE='\033[1;34m'
+RED='\033[0;31m'
+YELLOW='\033[0;33m'
+NC='\033[0m'
+
+function rm_trash_bin(){
+    if [[ "$#" == "1" ]]; then
+        TARGET=$1
+        ARGS=""
+    else
+        TARGET=$2
+        ARGS=$1
+    fi
+
+    if [[ $ARGS == *f* ]]; then
+        if [[ -d $TARGET  ]]; then
+	   cp -r $TARGET /tmp/trash/$TARGET-$(date +"%s")
+        else
+ 	   cp $TARGET /tmp/trash/$TARGET-$(date +"%s")
+        fi
+        /usr/bin/rm $ARGS $TARGET
+    elif [[ $ARGS == *F* ]]; then
+        /usr/bin/rm $(echo $ARGS | sed -e "s/F/f/") $TARGET
+    else
+        printf "${YELLOW}Do you want to delete: ${GREEN}$TARGET ? ${YELLOW}y/n${NC}"
+        read k
+        if [[ ${k} == 'y' ]]; then
+            if [[ -d $TARGET ]]; then
+   	        cp -r $TARGET /tmp/trash/$TARGET-$(date +"%s")
+            else
+     	        cp $TARGET /tmp/trash/$TARGET-$(date +"%s")
+            fi
+            /usr/bin/rm $ARGS $TARGET
+        fi
+    fi
+}
+rm_trash_bin $@
